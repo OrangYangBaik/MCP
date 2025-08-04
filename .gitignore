@@ -1,0 +1,7 @@
+*.exe
+.env
+__pycache__/
+Lib/
+*/__pycache__
+pyvenv.cfg
+mcp-venv
