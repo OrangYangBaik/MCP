@@ -323,6 +323,51 @@ class ListFoldersTool(Tool):
             return {}
 
 @dataclass
+class DeleteFolderTool(BaseTool, Tool):
+    name: str = "delete_folder"
+    description: str = "delete an existing folder"
+
+    async def execute(
+        self,
+        title: str
+    ) -> dict:
+        folder_result = await self.list_tool.execute()
+        notes = folder_result.get("data", [])
+        if notes:
+            if title:
+                for e in notes:
+                    score1 = fuzz.partial_ratio(e.get("title", ""), title)
+                    score2 = fuzz.token_set_ratio(e.get("title", ""), title)
+                    
+                    score = (score1 + score2) // 2
+
+                    if score > 90:
+                        folder_id = e.get("id")
+                        break
+                    else :
+                        folder_id = ""
+
+        try:
+            if not folder_id:
+                return {"data": f"there are no folder titled {title}"}
+            
+            async with aiohttp.ClientSession() as session:
+                url = f"http://localhost:8081/storage/folder/delete?folder_id={folder_id}"
+                headers = {
+                    "Authorization": f"Bearer {self.access_token}",
+                    "Accept": "application/json",
+                }
+                
+                async with session.post(url, headers=headers) as response:
+                    if response.status == 200:
+                        return {"data": f"Folder deleted successfully"}
+                    else:
+                        error_text = await response.text()
+                        return {"data": f"Failed to delete {response.status} - {error_text}"}
+        except Exception as e:
+            return {"data": f"Failed to delete folder: {str(e)}"}
+    
+@dataclass
 class CreateNoteTool(BaseTool, Tool):
     name: str = "create_note"
     description: str = "Create a new note"
@@ -590,6 +635,7 @@ class MCPService:
             "list_google_calendar_events": list_event_tool,
             "list_notes": list_note_tool,
             "list_folders": list_folder_tool,
+            "delete_folder": DeleteFolderTool(list_tool=list_folder_tool),
             "create_note": CreateNoteTool(list_tool=list_folder_tool),
             "get_note": GetNoteTool(list_tool=list_note_tool),
             "update_note": UpdateNoteTool(list_tool=list_note_tool),

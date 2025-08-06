@@ -111,6 +111,21 @@ tool_dicts = [
             {
             "type": "function",
             "function": {
+                "name": "delete_folder",
+                "description": "delete a folder.",
+                "parameters": {
+                "type": "object",
+                "properties": {
+                    "title": { "type": "string", "description": "name of the folder" },
+                },
+                "required": ["title"],
+                "additionalProperties": False
+                }
+            }
+            },
+            {
+            "type": "function",
+            "function": {
                 "name": "create_note",
                 "description": "Create a new note.",
                 "parameters": {
