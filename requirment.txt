@@ -1,0 +1,8 @@
+aiohttp
+aiohttp_cors
+anyio
+python-dotenv
+fastmcp
+thefuzz
+python-dateutil
+openai
