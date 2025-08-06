@@ -79,3 +79,5 @@ go mod tidy
 git clone https://github.com/OrangYangBaik/joplin
 go mod tidy
 ```
+4. Joplin Desktop
+Install Joplin Desktop and enable web clipper
