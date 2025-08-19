@@ -380,7 +380,10 @@ class CreateNoteTool(BaseTool, Tool):
         files: list = None
     ) -> dict:
         folders_result  = await self.list_tool.execute()
-        folders = folders_result.get("data", [])
+        if folders_result.get("data") is None:
+            folders = []
+        else:
+            folders = folders_result.get("data", [])
 
         if folders:
             if folder_name:
@@ -394,6 +397,9 @@ class CreateNoteTool(BaseTool, Tool):
                         parent_id = e.get("id")
             else:
                 parent_id = ""
+        else:
+            parent_id = ""
+
         try:
             data = {
                 "title": title,
@@ -401,7 +407,6 @@ class CreateNoteTool(BaseTool, Tool):
                 "parent_id": parent_id,
                 "folder_tree": json.dumps(folders),
             }
-
             form_data = aiohttp.FormData()
             form_data.add_field("title", str(data["title"]))
             form_data.add_field("body", str(data["body"]))
